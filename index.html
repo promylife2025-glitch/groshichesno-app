@@ -1137,36 +1137,65 @@
         }
 
         // ============ LOAD PRODUCTS ============
+        // ===== FALLBACK LOCAL DATA (якщо Supabase недоступний) =====
+        const LOCAL_PRODUCTS = [
+          {id:1,mfo_name:'BankaCredit',product_name:'Швидка заявка',slogan:'Кредит за 15 хвилин',amount_min:1000,amount_max:30000,term_min:1,term_max:360,rate_daily_min:0.01,rate_daily_max:1.0,rrps_min:3.65,rrps_max:5510.78,commission_pct:0,calc_engine:'simple',rate_period1:0.0001,rate_standard:0.01,first_free:true,tags:['🎁 Перший під 0%','⚡ Швидко'],speed:'15 хв',approval_pct:75,affiliate_url:'https://banka.credit',sort_order:1,is_active:true},
+          {id:2,mfo_name:'Starfin',product_name:'Кредит під 0.01%',slogan:'Перший кредит майже безкоштовно',amount_min:1000,amount_max:20000,term_min:1,term_max:120,rate_daily_min:0.01,rate_daily_max:0.95,rrps_min:2572.74,rrps_max:3369.39,commission_pct:0,calc_engine:'stepped',rate_period1:0.0001,rate_standard:0.0095,period_days:10,first_free:true,tags:['🎁 Перший під 0%','✅ Без комісій'],speed:'10 хв',approval_pct:70,affiliate_url:'https://starfin.ua',sort_order:2,is_active:true},
+          {id:3,mfo_name:'CreditPlus',product_name:'Видача за кілька хв',slogan:'Гроші на карту миттєво',amount_min:500,amount_max:50000,term_min:1,term_max:365,rate_daily_min:0.01,rate_daily_max:1.0,rrps_min:1244.55,rrps_max:3546.38,commission_pct:0,calc_engine:'stepped',rate_period1:0.0001,rate_standard:0.0095,period_days:14,first_free:true,tags:['🎁 Перший під 0%','⚡ Миттєво','🔥 Топ схвалення'],speed:'5 хв',approval_pct:85,affiliate_url:'https://creditplus.ua',sort_order:3,is_active:true},
+          {id:4,mfo_name:'ТвояПозика',product_name:'Від 0.01% до 1%',slogan:'Кредит для кожного',amount_min:1000,amount_max:150000,term_min:1,term_max:169,rate_daily_min:0.01,rate_daily_max:1.0,rrps_min:1733.86,rrps_max:9726.31,commission_pct:0,calc_engine:'stepped',rate_period1:0.0001,rate_standard:0.01,period_days:10,first_free:true,tags:['🎁 Перший під 0%','💰 Великі суми'],speed:'30 хв',approval_pct:65,affiliate_url:'https://tvoyapozyka.ua',sort_order:4,is_active:true},
+          {id:5,mfo_name:'Tengo',product_name:'Акція Золото Лепрекона',slogan:'Кредит зі знижкою',amount_min:1000,amount_max:30000,term_min:1,term_max:360,rate_daily_min:0.01,rate_daily_max:0.95,rrps_min:1373.87,rrps_max:2820.55,commission_pct:0,calc_engine:'stepped',rate_period1:0.0001,rate_standard:0.0095,period_days:14,first_free:true,tags:['🎁 Перший під 0%','🏷 Акція'],speed:'15 хв',approval_pct:72,affiliate_url:'https://tengo.ua',sort_order:5,is_active:true},
+          {id:6,mfo_name:'CreditKasa',product_name:'Позики з 2017 р.',slogan:'Надійна МФО з досвідом',amount_min:1000,amount_max:100000,term_min:1,term_max:365,rate_daily_min:0.01,rate_daily_max:1.0,rrps_min:178.66,rrps_max:6619.47,commission_pct:0,calc_engine:'simple',rate_period1:0.0001,rate_standard:0.01,first_free:true,tags:['🎁 Перший під 0%','🛡 Надійна'],speed:'20 хв',approval_pct:78,affiliate_url:'https://creditkasa.com.ua',sort_order:6,is_active:true},
+          {id:7,mfo_name:'SelfieCredit',product_name:'Без зайвих комісій',slogan:'Тільки чесні умови',amount_min:500,amount_max:50000,term_min:1,term_max:365,rate_daily_min:0.01,rate_daily_max:1.0,rrps_min:1244.55,rrps_max:3422.24,commission_pct:0,calc_engine:'stepped',rate_period1:0.0001,rate_standard:0.01,period_days:14,first_free:true,tags:['✅ Без комісій','🎁 Перший під 0%'],speed:'15 хв',approval_pct:74,affiliate_url:'https://selfiecredit.ua',sort_order:7,is_active:true},
+          {id:8,mfo_name:'ШвидкоГроші',product_name:'Від 0.01% до 1%',slogan:'Найвищий % схвалення',amount_min:500,amount_max:50000,term_min:1,term_max:217,rate_daily_min:0.01,rate_daily_max:1.0,rrps_min:1973.0,rrps_max:11016.79,commission_pct:0,calc_engine:'stepped',rate_period1:0.0001,rate_standard:0.01,period_days:14,first_free:true,tags:['🔥 Топ схвалення','🎁 Перший під 0%','⚡ Швидко'],speed:'5 хв',approval_pct:90,affiliate_url:'https://sgroshi.com.ua',sort_order:8,is_active:true},
+          {id:9,mfo_name:'Єгроші',product_name:'Перша позика під 0.01%',slogan:'Нижча ставка — менша переплата',amount_min:2000,amount_max:30000,term_min:2,term_max:30,rate_daily_min:0.01,rate_daily_max:0.25,rrps_min:47.43,rrps_max:107.36,commission_pct:0,calc_engine:'simple',rate_period1:0.0001,rate_standard:0.0025,first_free:true,tags:['🎁 Перший під 0%','📉 Низька ставка'],speed:'10 хв',approval_pct:76,affiliate_url:'https://e-groshi.com',sort_order:9,is_active:true},
+          {id:10,mfo_name:'Pango',product_name:'Видача за 10 хв',slogan:'Швидко і без зайвих питань',amount_min:1000,amount_max:25000,term_min:1,term_max:360,rate_daily_min:0.01,rate_daily_max:0.95,rrps_min:1341.97,rrps_max:2741.36,commission_pct:0,calc_engine:'stepped',rate_period1:0.0001,rate_standard:0.0095,period_days:14,first_free:true,tags:['⚡ Швидко','🎁 Перший під 0%'],speed:'10 хв',approval_pct:73,affiliate_url:'https://pango.com.ua',sort_order:10,is_active:true},
+          {id:11,mfo_name:'SlonCredit',product_name:'Електроскутер за кредит',slogan:'Акційні пропозиції',amount_min:1000,amount_max:32000,term_min:1,term_max:360,rate_daily_min:0.01,rate_daily_max:1.0,rrps_min:2636.40,rrps_max:4049.26,commission_pct:0,calc_engine:'simple',rate_period1:0.0001,rate_standard:0.01,first_free:true,tags:['🎁 Перший під 0%','🏷 Акція'],speed:'20 хв',approval_pct:68,affiliate_url:'https://sloncredit.com.ua',sort_order:11,is_active:true},
+          {id:12,mfo_name:'Credit7',product_name:'Акція ФОРМУЛА 7',slogan:'Кредит на рік зі знижкою',amount_min:500,amount_max:50000,term_min:360,term_max:365,rate_daily_min:0.01,rate_daily_max:0.95,rrps_min:1132.58,rrps_max:3845.25,commission_pct:10,calc_engine:'stepped',rate_period1:0.0001,rate_standard:0.0095,period_days:10,first_free:true,tags:['🎁 Перший під 0%','📅 Довгий строк'],speed:'15 хв',approval_pct:71,affiliate_url:'https://credit7.ua',sort_order:12,is_active:true},
+          {id:13,mfo_name:'AlexCredit',product_name:'0.01% — це реально',slogan:'Перший кредит майже безкоштовно',amount_min:500,amount_max:6000,term_min:5,term_max:430,rate_daily_min:0.01,rate_daily_max:1.0,rrps_min:447.0,rrps_max:447.0,commission_pct:0,calc_engine:'stepped',rate_period1:0.0001,rate_standard:0.01,period_days:30,first_free:true,tags:['🎁 Перший під 0%'],speed:'15 хв',approval_pct:66,affiliate_url:'https://alexcredit.com.ua',sort_order:13,is_active:true},
+          {id:14,mfo_name:'MaoCredit',product_name:'0.01% для нових клієнтів',slogan:'Вигідні умови для нових',amount_min:1000,amount_max:100000,term_min:1,term_max:365,rate_daily_min:0.01,rate_daily_max:1.0,rrps_min:3.65,rrps_max:5510.78,commission_pct:0,calc_engine:'simple',rate_period1:0.0001,rate_standard:0.01,first_free:true,tags:['🎁 Перший під 0%','💰 Великі суми'],speed:'15 хв',approval_pct:77,affiliate_url:'https://maocredit.com.ua',sort_order:14,is_active:true}
+        ];
+
         async function loadProducts() {
             try {
                 isLoading = true;
                 showSkeletons();
 
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 5000);
+
                 const res = await fetch(
-                    `${SUPABASE_URL}/rest/v1/mfo_products?is_active=eq.true&order=sort_order`,
+                    `${SUPABASE_URL}/rest/v1/mfo_products?select=*&order=sort_order`,
                     {
+                        signal: controller.signal,
                         headers: {
                             'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
                         }
                     }
                 );
+                clearTimeout(timeout);
 
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
                 const data = await res.json();
-                products = Array.isArray(data) ? data : [];
+                products = Array.isArray(data) && data.length > 0 ? data : LOCAL_PRODUCTS;
                 isLoading = false;
-                console.log('Loaded products:', products.length);
+                console.log('Loaded from Supabase:', products.length);
                 renderStorefront();
-                // Якщо зараз відкрита вітрина — оновити її
                 if (document.getElementById('screen-vitryna').classList.contains('active')) {
                     renderVitryna();
                 }
             } catch (err) {
-                console.error('Load error:', err);
+                console.warn('Supabase unavailable, using local data:', err.message);
+                products = LOCAL_PRODUCTS;
                 isLoading = false;
-                showError();
+                console.log('Loaded from local:', products.length);
+                renderStorefront();
+                if (document.getElementById('screen-vitryna').classList.contains('active')) {
+                    renderVitryna();
+                }
             }
         }
 
